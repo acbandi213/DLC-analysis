@@ -30,16 +30,18 @@ df['fTE'] = df['Trial End']*150
 df['tS1'] = df['Stim On'] - df['Trial Start']
 df['tS2'] = df['Response'] - df['Stim On']
 df['tS3'] = df['Trial End'] - df['Response']
+ITI_time = []
 
-for time in df[(df.index < 737)].index:
+for sesh in df[(df.index < 737)].index:
     
-    start = int((df['Trial End'][time]))
-    stop = int((df['Trial Start'][time+1]))
+    start = df['Trial End'][sesh]
+    stop = df['Trial Start'][sesh+1]
     
-    ITI_time = []
-    
-ITI_time.append([0])
-df['tITI'] = np.array(speed_mean)
+    x = stop - start 
+    ITI_time.append(x)
+
+ITI_time.append(0)
+df['tITI'] = np.array(ITI_time)
 
 extension = 'csv'
 result = glob.glob('*.{}'.format(extension))
