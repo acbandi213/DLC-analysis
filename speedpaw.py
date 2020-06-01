@@ -41,124 +41,44 @@ df2.columns = ['frame','earx','eary','eyetopx','eyetopy','eyerx','eyery','eyebot
              'pinkyrx','pinkyry','ringrx','ringry','middlerx','middlery','pointerrx','pointerry',
              'pinkylx','pinkyly','ringlx','ringly','middlelx','middlely','pointerlx','pointerly']
 
+jointx = 'pointerrx'
+jointy = 'pointerry'
+
 def euclid(x1,y1,x2,y2):
     return (((((x2-x1)**2 + (y2-y1)**2)**.5)/9.18)/10)
 
 def speed(x1,y1,x2,y2):
     return euclid(x1,y1,x2,y2)/(1/150)
 
-jointx = 'pointerrx'
-jointy = 'pointerry'
+def calc_mean(x,y,z):
 
-#Mean speed of right pointer finger joint from trial start to stim on time
+    speed_mean = []
 
-speed_mean = []
+    for val in df.index:
 
-for val in df.index:
+        start = int((df[x][val]))
+        stop = int((df[y][val]))
 
-    start = int((df['fTS'][val]))
-    stop = int((df['fSO'][val]))
+        speed_calc = []
 
-    speed_calc = []
+        global sp
 
-    for val2 in df2[(df2.index >= start) & (df2.index < stop)].index:
+        for val2 in df2[(df2.index >= start) & (df2.index < stop)].index:
 
-        sp = np.array(speed(df2[jointx].iloc[val2],df2[jointy].iloc[val2],
+            sp = np.array(speed(df2[jointx].iloc[val2],df2[jointy].iloc[val2],
             df2[jointx].iloc[val2+1],df2[jointy].iloc[val2+1])).mean()
 
-    speed_calc.append(sp)
+        speed_calc.append(sp)
 
-    speed_mean.append(speed_calc)
+        speed_mean.append(speed_calc)
 
-df['S1'] = np.array(speed_mean)
+    df[z] = np.array(speed_mean)
 
-#Mean speed of right pointer finger joint from stim onset to Go Cue
+calc_mean('fTS','fSO','S1') #Mean speed from trial start to stim on time
 
-speed_mean = []
+calc_mean('fSO','fRes','S2') #Mean speed from stim onset to Go Cue
 
-for val in df.index:
-
-    start = int((df['fSO'][val]))
-    stop = int((df['fGo'][val]))
-
-    speed_calc = []
-
-    for val2 in df2[(df2.index >= start) & (df2.index < stop)].index:
-
-        sp = np.array(speed(df2[jointx].iloc[val2],df2[jointy].iloc[val2],
-            df2[jointx].iloc[val2+1],df2[jointy].iloc[val2+1])).mean()
-
-    speed_calc.append(sp)
-
-    speed_mean.append(speed_calc)
-
-df['S2'] = np.array(speed_mean)
-
-#Mean speed of right pointer finger joint from Go Cue to Response registered time
-
-speed_mean = []
-
-for val in df.index:
-
-    start = int((df['fGo'][val]))
-    stop = int((df['fRes'][val]))
-
-    speed_calc = []
-
-    for val2 in df2[(df2.index >= start) & (df2.index < stop)].index:
-
-        sp = np.array(speed(df2[jointx].iloc[val2],df2[jointy].iloc[val2],
-            df2[jointx].iloc[val2+1],df2[jointy].iloc[val2+1])).mean()
-
-    speed_calc.append(sp)
-
-    speed_mean.append(speed_calc)
-
-df['S3'] = np.array(speed_mean)
-
-#Mean speed of right pointer finger joint from Response registered time to feedback time
-
-speed_mean = []
-
-for val in df.index:
-
-    start = int((df['fRes'][val]))
-    stop = int((df['fFeed'][val]))
-
-    speed_calc = []
-
-    for val2 in df2[(df2.index >= start) & (df2.index < stop)].index:
-
-        sp = np.array(speed(df2[jointx].iloc[val2],df2[jointy].iloc[val2],
-            df2[jointx].iloc[val2+1],df2[jointy].iloc[val2+1])).mean()
-
-    speed_calc.append(sp)
-
-    speed_mean.append(speed_calc)
-
-df['S4'] = np.array(speed_mean)
-
-#Mean speed of right pointer finger joint from feedback time to trial end
-
-speed_mean = []
-
-for val in df.index:
-
-    start = int((df['fFeed'][val]))
-    stop = int((df['fTE'][val]))
-
-    speed_calc = []
-
-    for val2 in df2[(df2.index >= start) & (df2.index < stop)].index:
-
-        sp = np.array(speed(df2[jointx].iloc[val2],df2[jointy].iloc[val2],
-            df2[jointx].iloc[val2+1],df2[jointy].iloc[val2+1])).mean()
-
-    speed_calc.append(sp)
-
-    speed_mean.append(speed_calc)
-
-df['S5'] = np.array(speed_mean)
+calc_mean('fRes','fTE','S3') #Mean speed from stim onset to Response registered time
 
 #Mean speed of right pointer finger joint during ITI
 
@@ -190,3 +110,5 @@ ext = '.csv'
 input = filea[0] + addpaw + ext
 
 df.to_csv(input,index=False)
+
+print('analyzed')
