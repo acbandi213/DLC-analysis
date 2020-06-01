@@ -20,13 +20,26 @@ df['Feedback type'] = np.load('_ibl_trials.feedbackType.npy') #-1 for negative, 
 df['Opto'] = np.load('_ibl_trials.opto.npy') #Whether trial was Opto (1) or No (0)
 df['Opto Prob'] = np.load('_ibl_trials.opto_probability_left.npy') #Probability of Opto
 
-#times converted to approx frame based on frame rate of 150Hz
+#times converted to approx frame based on frame rate of 150Hz 
 df['fTS'] = df['Trial Start']*150
 df['fSO'] = df['Stim On']*150
-df['fGo'] = df['Go Cue']*150
 df['fRes'] = df['Response']*150
-df['fFeed'] = df['Feedback times']*150
 df['fTE'] = df['Trial End']*150
+
+#time length of each epoch 
+df['tS1'] = df['Stim On'] - df['Trial Start']
+df['tS2'] = df['Response'] - df['Stim On']
+df['tS3'] = df['Trial End'] - df['Response']
+
+for time in df[(df.index < 737)].index:
+    
+    start = int((df['Trial End'][time]))
+    stop = int((df['Trial Start'][time+1]))
+    
+    ITI_time = []
+    
+ITI_time.append([0])
+df['tITI'] = np.array(speed_mean)
 
 extension = 'csv'
 result = glob.glob('*.{}'.format(extension))
