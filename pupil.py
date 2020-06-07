@@ -128,7 +128,7 @@ def dlc(path):
     filea = result[0].split('.csv')
     addpaw = 'pupil'
     ext = '.csv'
-    input = addpaw + filea + ext
+    input = addpaw + ext
 
     df.to_csv(input,index=False)
 
