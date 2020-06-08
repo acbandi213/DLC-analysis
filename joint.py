@@ -106,7 +106,7 @@ def dlc(path):
 
     #Mean speed of right pointer finger joint during ITI
     speed_mean = []
-    for val in df[(df.index < 737)].index:
+    for val in df[(df.index < df.index.max())].index:
         start = int((df['fTE'][val]))
         stop = int((df['fTS'][val+1]))
         sp = df2['sp'].iloc[start:stop].mean()
