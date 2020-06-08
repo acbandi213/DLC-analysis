@@ -107,7 +107,7 @@ def dlc(path):
     Diam_mean_H = []
     Diam_mean_V = []
     Circ = []
-    for val in df[(df.index < 737)].index:
+    for val in df[(df.index < df.index.max())].index:
         start = int((df['fTE'][val]))
         stop = int((df['fTS'][val+1]))
         global eucH
