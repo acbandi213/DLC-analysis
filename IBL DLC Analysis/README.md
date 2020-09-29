@@ -1,4 +1,4 @@
-#IBL DLC analysis scripts
+# IBL DLC analysis scripts
 
 joint.py: calculates the mean speed of the right pointer finger joint during each epoch of the trial
 
