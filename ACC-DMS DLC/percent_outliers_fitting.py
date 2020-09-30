@@ -7,6 +7,7 @@ from numpy import save
 import pandas as pd
 import glob
 import os
+import sys
 import yaml
 from ruamel.yaml import YAML
 import statsmodels.api as sm
@@ -14,16 +15,17 @@ import warnings
 from statsmodels.tools.sm_exceptions import ConvergenceWarning
 
 #.h5 filepath
-path = r"Y:\DLC\outlier_test\*.h5"
+file_path = sys.argv[1]
+path = file_path + "/videos/*.h5"
 
 ##import config file info 
-config = r"Y:\DLC\ACC_DMS_imaging-acb-2020-09-01\config.yaml"
+config = file_path + "/config.yaml"
 ruamelFile = YAML()
 cfg = ruamelFile.load(config)
 
 #bodyparts & relevant config data 
-dataname = 'DLC_resnet50_ACC_DMS_imagingSep1shuffle1_300000'
-bodyparts = ['left ear', 'right ear', 'Scope 1', 'Scope 2', 'base of tail', 'nosepoke']
+dataname = 'DLC_resnet50_ACC DMS nphr noskelSept21shuffle1_450000'
+bodyparts = ['Body', 'Left Ear', 'Right Ear', 'Implant', 'Base of Tail', 'Nosepoke']
 p_bound = 0.01
 epsilon = 20 #number of pixel distance
 ARdegree=3
@@ -160,7 +162,7 @@ def calculate_percent_outlier_frames(path):
         c = calc_fitting(fname)
         fitting_val.append(c)
 
-    return fitting_val 
+    os.chdir(file_path)
+    save('fitting.npy', fitting_val)
 
 calculate_percent_outlier_frames(path)
-
