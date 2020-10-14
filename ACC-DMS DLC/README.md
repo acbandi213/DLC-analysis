@@ -15,6 +15,10 @@ find which frames are outliers for one video.ipynb - Jupityer notebook that take
 
 extract outlier frames from video.ipynb - Jupityer notebook that extracts outlier frames identified by each outlier algorithm as well as outlier frames that are common across all 3 outlier algorithms. 
 
+extract_jump_outliers.py - identifies outlier frames using 'jump' algorthm and extracts a certain amount of outlier frames from each video 
+
+extract_outliers_from_all_frames.py - identifies all outlier frames in all videos using jump and then extracts a random amount of outlier frames across all videos 
+
 # Random
 find_percent_disenaged_frames.py - sets an ROI and any frame in which the joints are outside the ROI are identified as disengaged 
 
