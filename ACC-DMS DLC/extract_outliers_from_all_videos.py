@@ -8,8 +8,8 @@ import sys
 import yaml
 from ruamel.yaml import YAML
 
-#.h5 filepath
-file_path = "/tigress/acbandi/DLC/ACC_DMS_imaging_skel-acb-2020-10-01"
+#filepaths
+file_path = "/tigress/acbandi/DLC/ACC-DMS_nphr_final_skel-acb-2020-10-05
 data_path = file_path + "/videos"
 save_path = file_path + "/labeled-data/Outliers"
 
@@ -19,9 +19,9 @@ ruamelFile = YAML()
 cfg = ruamelFile.load(config)
 
 #bodyparts & relevant config data 
-bodyparts = ['body', 'left ear', 'right ear', 'Scope 1', 'Scope 2', 'base of tail', 'nosepoke']
-epsilon = 30 #number of pixel distance
-how_many_frames_to_extract = 400
+bodyparts = ['Implant', 'Body', 'Left Ear', 'Right Ear', 'Base of Tail', 'Nosepoke'] 
+epsilon = 100 #number of pixel distance
+how_many_frames_to_extract = 100
 
 def calc_jump(h5_file):
     df = pd.read_hdf(h5_file) ##import data file 
@@ -70,16 +70,56 @@ for i in data_list:
 all_outlier = pd.concat(all_outlier)
 
 rand_outliers = pd.DataFrame(all_outlier.sample(n=how_many_frames_to_extract))
-num_list = list(range(how_many_frames_to_extract))
+os.chdir(file_path)
+list_tracked_frames = np.load("list_track.npy") #list of frames used to train the network
+rand_label = rand_outliers['movie'].values
+rand_count = list(range(0,len(rand_label)))
 
-for num in num_list:
-    movie_name = rand_outliers['movie'].iloc[num]
-    vidpath = data_path + "/" + movie_name + ".mp4"
-    vid = cv2.VideoCapture(vidpath)
-    start_frame = rand_outliers['frame'].iloc[num]
-    end_frame = start_frame + 1 
-    for ran in range(start_frame, end_frame):
-        vid.set(1, ran)
-        ret, still = vid.read()
-        os.chdir(save_path)
-        cv2.imwrite(movie_name + f'_img{start_frame}.png', still)
+rand_arr = []
+for x in rand_count:
+    arr = rand_label[x] + "/" + str(rand_outliers['frame'].iloc[x])
+    rand_arr.append(arr)
+    
+while len(rand_arr) == how_many_frames_to_extract:
+
+    if len(np.intersect1d(list_tracked_frames, rand_arr)) == 0:
+        num_list = list(range(how_many_frames_to_extract))
+        for num in num_list:
+            movie_name = rand_outliers['movie'].iloc[num]
+            vidpath = data_path + "/" + movie_name + ".mp4"
+            vid = cv2.VideoCapture(vidpath)
+            trackpath = data_path + "/" + movie_name + "DLC_resnet50_ACC-DMS nphr final skelOct05shuffle1_450000" + ".h5"
+            h5_df = pd.read_hdf(trackpath)
+            
+            start_frame = rand_outliers['frame'].iloc[num]
+            
+            vid.set(1, start_frame)
+            ret, still = vid.read()
+
+            body_x = int(h5_df['DLC_resnet50_ACC-DMS nphr final skelOct05shuffle1_450000']['Implant']['x'].iloc[start_frame])
+            body_y = int(h5_df['DLC_resnet50_ACC-DMS nphr final skelOct05shuffle1_450000']['Implant']['y'].iloc[start_frame])
+            left_x = int(h5_df['DLC_resnet50_ACC-DMS nphr final skelOct05shuffle1_450000']['Body']['x'].iloc[start_frame])
+            left_y = int(h5_df['DLC_resnet50_ACC-DMS nphr final skelOct05shuffle1_450000']['Body']['y'].iloc[start_frame])
+            right_x = int(h5_df['DLC_resnet50_ACC-DMS nphr final skelOct05shuffle1_450000']['Left Ear']['x'].iloc[start_frame])
+            right_y = int(h5_df['DLC_resnet50_ACC-DMS nphr final skelOct05shuffle1_450000']['Left Ear']['y'].iloc[start_frame])
+            scope1_x = int(h5_df['DLC_resnet50_ACC-DMS nphr final skelOct05shuffle1_450000']['Right Ear']['x'].iloc[start_frame])
+            scope1_y = int(h5_df['DLC_resnet50_ACC-DMS nphr final skelOct05shuffle1_450000']['Right Ear']['y'].iloc[start_frame])
+            base_x = int(h5_df['DLC_resnet50_ACC-DMS nphr final skelOct05shuffle1_450000']['Base of Tail']['x'].iloc[start_frame])
+            base_y = int(h5_df['DLC_resnet50_ACC-DMS nphr final skelOct05shuffle1_450000']['Base of Tail']['y'].iloc[start_frame])
+            nose_x = int(h5_df['DLC_resnet50_ACC-DMS nphr final skelOct05shuffle1_450000']['Nosepoke']['x'].iloc[start_frame])
+            nose_y = int(h5_df['DLC_resnet50_ACC-DMS nphr final skelOct05shuffle1_450000']['Nosepoke']['y'].iloc[start_frame])
+                
+            image = cv2.circle(still, (body_x,body_y), radius=5, color=(255, 0, 0), thickness = 2)
+            image = cv2.circle(still, (left_x,left_y), radius=5, color=(255, 0, 0), thickness = 2)
+            image = cv2.circle(still, (right_x,right_y), radius=5, color=(255, 0, 0), thickness = 2)
+            image = cv2.circle(still, (scope1_x,scope1_y), radius=5, color=(255, 0, 0), thickness = 2)
+            image = cv2.circle(still, (scope2_x,scope2_y), radius=5, color=(255, 0, 0), thickness = 2)
+            image = cv2.circle(still, (base_x,base_y), radius=5, color=(255, 0, 0), thickness = 2)
+            image = cv2.circle(still, (nose_x,nose_y), radius=5, color=(255, 0, 0), thickness = 2)
+                
+            os.chdir(save_path)
+            cv2.imwrite(movie_name + f'_img{start_frame}.png', still)
+        break
+
+    elif len(np.intersect1d(list_tracked_frames, rand_arr)) != 0:
+        print('tracked frame is in the random outlier extract!')
