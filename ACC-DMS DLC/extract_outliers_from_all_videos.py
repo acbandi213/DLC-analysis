@@ -20,7 +20,7 @@ cfg = ruamelFile.load(config)
 
 #bodyparts & relevant config data 
 bodyparts = ['Implant', 'Body', 'Left Ear', 'Right Ear', 'Base of Tail', 'Nosepoke'] 
-epsilon = 100 #number of pixel distance
+epsilon = 40 #number of pixel distance
 how_many_frames_to_extract = 100
 
 def calc_jump(h5_file):
