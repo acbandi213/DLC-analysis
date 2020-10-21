@@ -1,3 +1,5 @@
+#This script is what was used to identify and extract outliers that went into re-training the ACC-DMS DLC networks 
+
 import numpy as np
 from numpy import save
 import pandas as pd
@@ -9,7 +11,7 @@ import yaml
 from ruamel.yaml import YAML
 
 #filepaths
-file_path = "/tigress/acbandi/DLC/ACC-DMS_nphr_final_skel-acb-2020-10-05
+file_path = "/tigress/acbandi/DLC/ACC-DMS_nphr_final_skel-acb-2020-10-05"
 data_path = file_path + "/videos"
 save_path = file_path + "/labeled-data/Outliers"
 
